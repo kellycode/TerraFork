@@ -10,7 +10,7 @@ let NTS_INPUT = {
         forward: 0,
         back: 0,
         pitchup: 0,
-        pitchdown: 0,
+        pitchdown: 0
     },
 
     keyStates: [],
@@ -19,7 +19,6 @@ let NTS_INPUT = {
     initialized: false,
 
     setState: function (k, s) {
-        console.log(k)
         var cs = this.state;
         // arrow keys L/R/F/B
         if (k === 37) // left arrow

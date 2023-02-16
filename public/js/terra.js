@@ -31,10 +31,9 @@
 
 
       ({
-          1: [function (require, module, exports) {/*anim.js*/
-              }, {}],
+          1: [function (require, module, exports) {/*anim.js*/}, {}],
 
-          2: [function (require, module, exports) {
+          2: [function (require, module, exports) {/*app.js*/
                   "use strict";
                   var __importDefault = (this && this.__importDefault) || function (mod) {
                       return (mod && mod.__esModule) ? mod : {"default": mod};
@@ -54,9 +53,8 @@
                   var util_1 = NTS_UTIL;
                   var loader_1 = NTS_LOADER;
                   var input = NTS_INPUT;
-                  var anim = NTS_ANIM;//__importStar(require("./anim"));
+                  var anim = NTS_ANIM;
                   var fullscreen = __importStar(require("./fullscreen"));
-                  var browser = __importStar(require("./browser"));
                   var world_1 = __importDefault(require("./world"));
 // circa 2016
                   var CONFIGS = {
@@ -101,7 +99,7 @@
                        */
                       function configUI() {
                           // Select a config roughly based on device type
-                          var cfgId = browser.isMobile.any ? 'mobile' : 'desktop';
+                          var cfgId = NTS_BROWSER.isMobile.any ? 'mobile' : 'desktop';
                           var cfg = CONFIGS[cfgId];
                           var sel = util_1.$i('sel_devicepower');
                           sel.value = cfgId;
@@ -136,7 +134,7 @@
                       function loadAssets() {
 
                           let onAssetsDone = function () {
-                              console.log('onAssetsDone called or, have we, as \'twere with a defeated joy loaded all assets');
+                              //console.log('onAssetsDone called or, have we, as \'twere with a defeated joy loaded all assets');
                           };
 
                           let onAssetsProgress = function (p) {
@@ -251,42 +249,7 @@
 
               }, {"./browser": 3, "./fullscreen": 5, "./world": 22}],
 
-          3: [function (require, module, exports) {
-                  "use strict";
-                  // LICENSE: MIT
-                  // Copyright (c) 2016 by Mike Linkovich
-                  Object.defineProperty(exports, "__esModule", {value: true});
-                  /** Try to determine if was launched from homescreen/desktop app launcher */
-                  exports.isStandalone = (function () {
-                      // iOS
-                      if (navigator.standalone !== undefined)
-                          return !!navigator.standalone;
-                      // Windows Mobile
-                      if (window.external && window.external.msIsSiteMode)
-                          return !!window.external.msIsSiteMode();
-                      // Chrome
-                      return window.matchMedia('(display-mode: standalone)').matches;
-                  }());
-                  exports.isMobile = (function () {
-                      var a = !!navigator.userAgent.match(/Android/i);
-                      var bb = !!navigator.userAgent.match(/BlackBerry/i);
-                      var ios = !!navigator.userAgent.match(/iPhone|iPad|iPod/i);
-                      var o = !!navigator.userAgent.match(/Opera Mini/i);
-                      var w = !!navigator.userAgent.match(/IEMobile/i);
-                      var ff = !!navigator.userAgent.match(/\(Mobile/i);
-                      var any = (a || bb || ios || o || w || ff);
-                      return {
-                          Android: a,
-                          BlackBerry: bb,
-                          iOS: ios,
-                          Opera: o,
-                          Windows: w,
-                          FireFox: ff,
-                          any: any
-                      };
-                  }());
-
-              }, {}],
+          3: [function (require, module, exports) {/*browser.js*/}, {}],
 
           4: [function (require, module, exports) {
                   "use strict";
@@ -541,7 +504,7 @@
 
               }, {"./simplex": 15}],
 
-          8: [function (require, module, exports) {
+          8: [function (require, module, exports) {/*heightfield.js*/
                   "use strict";
                   // LICENSE: MIT
                   // Copyright (c) 2016 by Mike Linkovich
@@ -830,45 +793,7 @@
 
               }, {"./app": 2}],
 
-          13: [function (require, module, exports) {
-                  "use strict";
-                  // LICENSE: MIT
-                  // Copyright (c) 2016 by Mike Linkovich
-                  var __importStar = (this && this.__importStar) || function (mod) {
-                      if (mod && mod.__esModule)
-                          return mod;
-                      var result = {};
-                      if (mod != null)
-                          for (var k in mod)
-                              if (Object.hasOwnProperty.call(mod, k))
-                                  result[k] = mod[k];
-                      result["default"] = mod;
-                      return result;
-                  };
-                  Object.defineProperty(exports, "__esModule", {value: true});
-                  var util_1 = NTS_UTIL;
-                  var anim = NTS_ANIM;//__importStar(require("./anim"));
-                  var notifying = false;
-                  function notify(msg) {
-                      var elTxt = util_1.$e('notification_text');
-                      elTxt.textContent = msg;
-                      if (notifying)
-                          return;
-                      var el = util_1.$e('notification');
-                      el.style.display = 'block';
-                      el.style.opacity = '1.0';
-                      notifying = true;
-                      setTimeout(function () {
-                          anim.fadeOut(el, 1000, function () {
-                              el.style.display = 'none';
-                              elTxt.textContent = '';
-                              notifying = false;
-                          });
-                      }, 4000);
-                  }
-                  exports.default = notify;
-
-              }, {"./anim": 1}],
+          13: [function (require, module, exports) {/*notification.js*/}, {}],
 
           14: [function (require, module, exports) {
                   "use strict";
@@ -891,7 +816,7 @@
                   var gmath_1 = NTS_GMATH;
                   var vec_1 = NTS_VEC;
                   var input = NTS_INPUT;
-                  var notification_1 = __importDefault(require("./notification"));
+                  var notification_1 = NTS_NOTIFICATION;
                   var heightfield_1 = __importDefault(require("./heightfield"));
                   var log = NTS_LOGGER;
                   var DEFAULT_HEIGHT = 0.0;
@@ -943,12 +868,12 @@
                           nextMode();
                           if (mode === MODE_AUTO) {
                               log.hide();
-                              notification_1.default('Press ENTER to change camera');
+                              notification_1.notify('Press ENTER to change camera');
                           } else if (mode === MODE_FLY) {
-                              notification_1.default('ARROWS drive, W/S move up/down.');
+                              notification_1.notify('ARROWS drive, W/S move up/down.');
                           } else if (mode === MODE_MAN) {
                               log.show();
-                              notification_1.default('ARROWS move, W/S move up/down, Q/A look up/down');
+                              notification_1.notify('ARROWS move, W/S move up/down, Q/A look up/down');
                           }
                       });
                       // scratchpad vectors
@@ -1176,7 +1101,7 @@
                   }
                   exports.default = Player;
 
-              }, {"./heightfield": 8, "./notification": 13}],
+              }, {"./heightfield": 8}],
 
           15: [function (require, module, exports) {
                   "use strict";
