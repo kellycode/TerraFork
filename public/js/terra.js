@@ -1624,7 +1624,7 @@
                   var logger = NTS_LOGGER;
                   var input = NTS_INPUT;
                   var skydome = __importStar(require("./skydome"));
-                  var heightfield_2 = NTS_HEIGHTFIELD_2;//__importStar(require("./heightfield"));
+                  var heightfield_2 = NTS_HEIGHTFIELD_2;
                   var grass = __importStar(require("./grass"));
                   var terrain_1 = __importDefault(require("./terrain"));
                   var terramap = __importStar(require("./terramap"));
