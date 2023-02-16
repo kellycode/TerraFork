@@ -1624,7 +1624,7 @@
                   var logger = NTS_LOGGER;
                   var input = NTS_INPUT;
                   var skydome = __importStar(require("./skydome"));
-                  var heightfield_1 = __importStar(require("./heightfield"));
+                  var heightfield_2 = NTS_HEIGHTFIELD_2;//__importStar(require("./heightfield"));
                   var grass = __importStar(require("./grass"));
                   var terrain_1 = __importDefault(require("./terrain"));
                   var terramap = __importStar(require("./terramap"));
@@ -1689,7 +1689,7 @@
                       var hfImg = assets.images['heightmap'];
                       var hfCellSize = HEIGHTFIELD_SIZE / hfImg.width;
                       var heightMapScale = vec_1.Vec3.create(1.0 / HEIGHTFIELD_SIZE, 1.0 / HEIGHTFIELD_SIZE, HEIGHTFIELD_HEIGHT);
-                      var heightField = heightfield_1.default({
+                      var heightField = heightfield_2.Heightfield({
                           cellSize: hfCellSize,
                           minHeight: 0.0,
                           maxHeight: heightMapScale.z,
@@ -1833,7 +1833,7 @@
                       }
                       ///////////////////////////////////////////////////////////////////
                       // Private instance methods
-                      var _hinfo = heightfield_1.HInfo();
+                      var _hinfo = heightfield_2.HInfo();
                       var _v = vec_1.Vec2.create(0.0, 0.0);
                       /**
                        * Logic update
@@ -1852,7 +1852,7 @@
                           var pyaw = player.state.yaw;
                           var ppitch = player.state.pitch;
                           var proll = player.state.roll;
-                          heightfield_1.default.infoAt(heightField, ppos.x, ppos.y, true, _hinfo);
+                          heightfield_2.infoAt(heightField, ppos.x, ppos.y, true, _hinfo);
                           var groundHeight = _hinfo.z;
                           if (logger.isVisible()) {
                               logger.setText("x:" + ppos.x.toFixed(4) +

@@ -1,20 +1,9 @@
 "use strict";
 
-class NTS_HEIGHTFIELD {
+let NTS_HEIGHTFIELD_2 = {
 
-    constructor(info) {
-        this.self = this;
-
-        this.HInfo = function () {
-            return {
-                i: 0,
-                t: 0,
-                z: 0.0,
-                n: NTS_VEC.Vec3.create()
-            };
-        };
-
-        this.hf = {
+    Heightfield: function (info) {
+        var hf = {
             cellSize: (info.cellSize && info.cellSize > 0) ? info.cellSize : 1.0,
             minHeight: (typeof info.minHeight === 'number') ? info.minHeight : 0.0,
             maxHeight: (typeof info.maxHeight === 'number') ? info.maxHeight : 1.0,
@@ -24,140 +13,47 @@ class NTS_HEIGHTFIELD {
             ySize: 0,
             heights: new Float32Array(0),
             faceNormals: new Float32Array(0),
-            vtxNormals: new Float32Array(0),
-
-            _hi: this.HInfo()
+            vtxNormals: new Float32Array(0)
         };
-
         if (info.image) {
-            this.genFromImg(info.image, this.hf);
+            this.genFromImg(info.image, hf);
         } else {
-            this.hf.xCount = info.xCount && info.xCount > 0 ? Math.floor(info.xCount) : 1;
-            this.hf.yCount = info.yCount && info.yCount > 0 ? Math.floor(info.yCount) : 1;
-            this.hf.xSize = this.hf.xCount * this.hf.cellSize;
-            this.hf.ySize = info.yCount * this.hf.cellSize;
-            this.hf.heights = info.heights || new Float32Array((this.hf.xCount + 1) * (this.hf.yCount + 1));
+            hf.xCount = info.xCount && info.xCount > 0 ? Math.floor(info.xCount) : 1;
+            hf.yCount = info.yCount && info.yCount > 0 ? Math.floor(info.yCount) : 1;
+            hf.xSize = hf.xCount * hf.cellSize;
+            hf.ySize = info.yCount * hf.cellSize;
+            hf.heights = info.heights || new Float32Array((hf.xCount + 1) * (hf.yCount + 1));
             // 2 normals per cell (quad)
-            this.hf.faceNormals = new Float32Array(3 * 2 * this.hf.xCount * this.hf.yCount);
-            this.hf.vtxNormals = new Float32Array(3 * (this.hf.xCount + 1) * (this.hf.yCount + 1));
-            this.calcFaceNormals(this.hf);
+            hf.faceNormals = new Float32Array(3 * 2 * hf.xCount * hf.yCount);
+            hf.vtxNormals = new Float32Array(3 * (hf.xCount + 1) * (hf.yCount + 1));
+            calcFaceNormals(hf);
         }
-    }
+        return hf;
+    },
 
-    /*
-     * Get heightfield info at point x,y. Outputs to hi.
-     * @param wrap If true, x,y coords will be wrapped
-     * around if out of bounds, otherwise minHeight returned.
-     * @param hi Struct to output result into.
-     */
-
-    /*
-     * 
-     * @param {type} hf
-     * @param {type} x
-     * @param {type} y
-     * @param {type} wrap
-     * @param {type} hi
-     * @returns {undefined}
-     */
-    static infoAt(hf, x, y, wrap, hi) {
-        let ox = -(hf.xSize / 2.0); // bottom left of heightfield
-        let oy = -(hf.ySize / 2.0);
-        if (x < ox || x >= -ox || y < oy || y >= -oy) {
-            if (!wrap) {
-                // out of bounds
-                hi.i = -1;
-                hi.z = hf.minHeight;
-                hi.n.x = hi.n.y = hi.n.z = 0;
-                hi.t = 0;
-                return;
-            }
-            // wrap around
-            x = NTS_GMATH.pmod(x - ox, hf.xSize) + ox;
-            y = NTS_GMATH.pmod(y - oy, hf.ySize) + oy;
+    HInfo: function () {
+        return {
+            i: 0, t: 0, z: 0.0, n: NTS_VEC.Vec3.create()
         }
-        let csz = hf.cellSize, normals = hf.faceNormals, n = hi.n, ix = Math.floor((x - ox) / csz), iy = Math.floor((y - oy) / csz), ih = ix + iy * (hf.xCount + 1), // height index
-              px = (x - ox) % csz, // relative x,y within this quad
-              py = (y - oy) % csz;
-        let i = ix + iy * hf.xCount; // tile index
-        if (py > 0 && px / py < 1.0) {
-            // top left tri
-            hi.t = 0;
-            n.x = normals[i * 6 + 0];
-            n.y = normals[i * 6 + 1];
-            n.z = normals[i * 6 + 2];
-        } else {
-            // bottom right tri
-            hi.t = 1;
-            n.x = normals[i * 6 + 3];
-            n.y = normals[i * 6 + 4];
-            n.z = normals[i * 6 + 5];
-        }
-        hi.i = i;
-        hi.z = getPlaneZ(n, hf.heights[ih], px, py);
-    }
+    },
 
-    /*
-     * Get height (z) at x,y
-     * @param wrap If true, x,y coords will be wrapped around if out of bounds,
-     * otherwise minHeight returned.
-     */
+    genFromImg: function (image, hf) {
 
-    /*
-     * 
-     * @param {type} hf
-     * @param {type} x
-     * @param {type} y
-     * @param {type} wrap
-     * @returns {NTS_HEIGHTFIELD._hi.z}
-     */
-    static heightAt(hf, x, y, wrap) {
-        //TODO: fix
-        if (wrap === void 0) {
-            wrap = false;
-        }
-        infoAt(hf, x, y, wrap, this._hi);
-        return this._hi.z;
-    }
-
-    /**
-     *  Given a plane with normal n and z=z0 at (x=0,y=0) find z at x,y.
-     *  @param n Normal vector of the plane.
-     *  @param z0 Height (z) coordinate of the plane at x=0,y=0.
-     *  @param x X coordinate to find height (z) at.
-     *  @param y Y coordinate to find height (z) at.
-     */
-    getPlaneZ(n, z0, x, y) {
-        return z0 - (n.x * x + n.y * y) / n.z;
-    }
-
-    // Internal helpers...
-    /*
-     * Generate heightfield from bitmap data. Lighter pixel colours are higher.
-     */
-
-    /*
-     * 
-     * @param {type} image
-     * @param {type} hf
-     * @returns {undefined}
-     */
-    genFromImg(image, hf) {
-        let x, y, i, height;
-        let w = image.width, h = image.height, heightRange = hf.maxHeight - hf.minHeight;
+        var x, y, i, height;
+        var w = image.width, h = image.height, heightRange = hf.maxHeight - hf.minHeight;
         hf.xCount = w - 1;
         hf.yCount = h - 1;
         hf.xSize = hf.xCount * hf.cellSize;
         hf.ySize = hf.yCount * hf.cellSize;
         // Draw to a canvas so we can get the data
-        let canvas = document.createElement('canvas');
+        var canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;
-        let ctx = canvas.getContext('2d');
+        var ctx = canvas.getContext('2d');
         ctx.drawImage(image, 0, 0, w, h);
         // array of canvas pixel data [r,g,b,a, r,g,b,a, ...]
-        let data = ctx.getImageData(0, 0, w, h).data;
-        let heights = new Float32Array(w * h);
+        var data = ctx.getImageData(0, 0, w, h).data;
+        var heights = new Float32Array(w * h);
         for (y = 0; y < h; ++y) {
             for (x = 0; x < w; ++x) {
                 // flip vertical because textures are Y+
@@ -177,28 +73,22 @@ class NTS_HEIGHTFIELD {
         // 2 normals per cell (quad)
         hf.faceNormals = new Float32Array(3 * 2 * hf.xCount * hf.yCount);
         hf.vtxNormals = new Float32Array(3 * (hf.xCount + 1) * (hf.yCount + 1));
-        calcFaceNormals(hf);
-        calcVertexNormals(hf);
-    }
+        this.calcFaceNormals(hf);
+        this.calcVertexNormals(hf);
+    },
 
-    /**
-     *  Calculate normals.
-     *  2 face normals per quad (1 per tri)
-     */
-
-    
-    calcFaceNormals(hf) {
-        let csz = hf.cellSize, xc = hf.xCount, // tile X & Y counts
+    calcFaceNormals: function (hf) {
+        var csz = hf.cellSize, xc = hf.xCount, // tile X & Y counts
               yc = hf.yCount, hxc = hf.xCount + 1, // height X count (1 larger than tile count)
               heights = hf.heights, // 1 less indirection
               normals = hf.faceNormals, v0 = NTS_VEC.Vec3.create(), v1 = NTS_VEC.Vec3.create(), n = NTS_VEC.Vec3.create(); // used to compute normals
-        let i = 0;
-        let tStart = Date.now();
-        for (let iy = 0; iy < yc; ++iy) {
-            for (let ix = 0; ix < xc; ++ix) {
+        var i = 0;
+        var tStart = Date.now();
+        for (var iy = 0; iy < yc; ++iy) {
+            for (var ix = 0; ix < xc; ++ix) {
                 i = 6 * (ix + iy * xc);
-                let ih = ix + iy * hxc;
-                let z = heights[ih];
+                var ih = ix + iy * hxc;
+                var z = heights[ih];
                 // 2 vectors of top-left tri
                 v0.x = csz;
                 v0.y = csz;
@@ -225,44 +115,38 @@ class NTS_HEIGHTFIELD {
                 normals[i + 5] = n.z;
             }
         }
-        
-        // just info
-        let dt = Date.now() - tStart;
-        console.log("computed " + i + " heightfield face normals in " + dt + "ms");
-    }
+        var dt = Date.now() - tStart;
+        console.log("computed ".concat(i, " heightfield face normals in ").concat(dt, "ms"));
+    },
 
-    calcVertexNormals(hf) {
-        let vnorms = hf.vtxNormals;
-        let w = hf.xCount + 1;
-        let h = hf.yCount + 1;
-        let n = NTS_VEC.Vec3.create();
-        let i = 0;
-        let tStart = Date.now();
-        for (let y = 0; y < h; ++y) {
-            for (let x = 0; x < w; ++x) {
-                computeVertexNormal(hf, x, y, n);
+    calcVertexNormals: function (hf) {
+        var vnorms = hf.vtxNormals;
+        var w = hf.xCount + 1;
+        var h = hf.yCount + 1;
+        var n = NTS_VEC.Vec3.create();
+        var i = 0;
+        var tStart = Date.now();
+        for (var y = 0; y < h; ++y) {
+            for (var x = 0; x < w; ++x) {
+                this.computeVertexNormal(hf, x, y, n);
                 i = (y * w + x) * 3;
                 vnorms[i++] = n.x;
                 vnorms[i++] = n.y;
                 vnorms[i++] = n.z;
             }
         }
-        let dt = Date.now() - tStart;
-        console.log("computed " + w * h + " vertex normals in " + dt + "ms");
-    }
+        var dt = Date.now() - tStart;
+        console.log("computed ".concat(w * h, " vertex normals in ").concat(dt, "ms"));
+    },
 
-    /**
-     * Compute a vertex normal by averaging the adjacent face normals.
-     */
-
-    computeVertexNormal(hf, vx, vy, n) {
-        let fnorms = hf.faceNormals;
+    computeVertexNormal: function (hf, vx, vy, n) {
+        var fnorms = hf.faceNormals;
         // This vertex is belongs to 4 quads
         // Do the faces this vertex is the 1st point of for this quad.
         // This is the quad up and to the right
-        let qx = vx % hf.xCount;
-        let qy = vy % hf.yCount;
-        let ni = (qy * hf.xCount + qx) * 3 * 2;
+        var qx = vx % hf.xCount;
+        var qy = vy % hf.yCount;
+        var ni = (qy * hf.xCount + qx) * 3 * 2;
         n.x = fnorms[ni + 0];
         n.y = fnorms[ni + 1];
         n.z = fnorms[ni + 2];
@@ -271,13 +155,13 @@ class NTS_HEIGHTFIELD {
         n.y += fnorms[ni + 1];
         n.z += fnorms[ni + 2];
         // 2nd tri of quad up and to the left
-        qx = NTS_GMATH.pmod(qx - 1, hf.xCount);
+        qx = (0, NTS_GMATH.pmod)(qx - 1, hf.xCount);
         ni = (qy * hf.xCount + qx) * 3 * 2 + 3;
         n.x += fnorms[ni + 0];
         n.y += fnorms[ni + 1];
         n.z += fnorms[ni + 2];
         // both tris of quad down and to the left
-        qy = NTS_GMATH.pmod(qy - 1, hf.yCount);
+        qy = (0, NTS_GMATH.pmod)(qy - 1, hf.yCount);
         ni = (qy * hf.xCount + qx) * 3 * 2;
         n.x += fnorms[ni + 0];
         n.y += fnorms[ni + 1];
@@ -294,5 +178,57 @@ class NTS_HEIGHTFIELD {
         n.z += fnorms[ni + 2];
         // Normalize to 'average' the result normal
         NTS_VEC.Vec3.normalize(n, n);
+    },
+    
+    infoAt: function(hf, x, y, wrap, hi) {
+        var ox = -(hf.xSize / 2.0); // bottom left of heightfield
+        var oy = -(hf.ySize / 2.0);
+        if (x < ox || x >= -ox || y < oy || y >= -oy) {
+            if (!wrap) {
+                // out of bounds
+                hi.i = -1;
+                hi.z = hf.minHeight;
+                hi.n.x = hi.n.y = hi.n.z = 0;
+                hi.t = 0;
+                return;
+            }
+            // wrap around
+            x = (0, gmath_1.pmod)(x - ox, hf.xSize) + ox;
+            y = (0, gmath_1.pmod)(y - oy, hf.ySize) + oy;
+        }
+        var csz = hf.cellSize, normals = hf.faceNormals, n = hi.n, ix = Math.floor((x - ox) / csz), iy = Math.floor((y - oy) / csz), ih = ix + iy * (hf.xCount + 1), // height index
+        px = (x - ox) % csz, // relative x,y within this quad
+        py = (y - oy) % csz;
+        var i = ix + iy * hf.xCount; // tile index
+        if (py > 0 && px / py < 1.0) {
+            // top left tri
+            hi.t = 0;
+            n.x = normals[i * 6 + 0];
+            n.y = normals[i * 6 + 1];
+            n.z = normals[i * 6 + 2];
+        }
+        else {
+            // bottom right tri
+            hi.t = 1;
+            n.x = normals[i * 6 + 3];
+            n.y = normals[i * 6 + 4];
+            n.z = normals[i * 6 + 5];
+        }
+        hi.i = i;
+        hi.z = this.getPlaneZ(n, hf.heights[ih], px, py);
+    },
+    
+    _hi: null,
+    
+    heightAt: function(hf, x, y, wrap) {
+        this._hi = this.HInfo();
+        if (wrap === void 0) { wrap = false; }
+        infoAt(hf, x, y, wrap, _hi);
+        return _hi.z;
+    },
+    
+    getPlaneZ: function(n, z0, x, y) {
+        return z0 - (n.x * x + n.y * y) / n.z;
     }
+
 }
