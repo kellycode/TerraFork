@@ -250,53 +250,9 @@
 
               }, {"./fullscreen": 5, "./world": 22}],
 
-          3: [function (require, module, exports) {/*browser.js*/
-              }, {}],
+          3: [function (require, module, exports) {/*browser.js*/}, {}],
 
-          4: [function (require, module, exports) {
-                  "use strict";
-                  // LICENSE: MIT
-                  // Copyright (c) 2016 by Mike Linkovich
-                  Object.defineProperty(exports, "__esModule", {value: true});
-                  /**
-                   * Create instance of Frames Per Second Monitor
-                   */
-                  function FPSMonitor(num) {
-                      if (num === void 0) {
-                          num = 16;
-                      }
-                      var ticks = new Array(num);
-                      var sum = 0;
-                      var index = 0;
-                      var f = 60.0; // frames per sec initial assumption
-                      for (var i = 0; i < num; ++i) {
-                          ticks[i] = 16.66666667;
-                          sum += 16.66666667;
-                      }
-                      /**
-                       *  Update with new sample
-                       *  @return New average frames/second
-                       */
-                      function update(dt) {
-                          sum -= ticks[index];
-                          sum += dt;
-                          ticks[index] = dt;
-                          index = (index + 1) % num;
-                          f = 1000 * num / sum;
-                          return f;
-                      }
-                      /** @return current fps string formatted to 1 decimal place */
-                      function fps() {
-                          return f.toFixed(1);
-                      }
-                      return {
-                          update: update,
-                          fps: fps
-                      };
-                  }
-                  exports.default = FPSMonitor;
-
-              }, {}],
+          4: [function (require, module, exports) {/*fps.js*/}, {}],
 
           5: [function (require, module, exports) {/*fullscreen.js*/}, {}],
 
@@ -1096,7 +1052,7 @@
 
               }, {}],
 
-          18: [function (require, module, exports) {
+          18: [function (require, module, exports) {/*terramap.js*/
                   "use strict";
                   // LICENSE: MIT
                   // Copyright (c) 2016 by Mike Linkovich
@@ -1225,60 +1181,7 @@
           20: [function (require, module, exports) {/*vec.js*/
               }, {}],
 
-          21: [function (require, module, exports) {
-                  "use strict";
-                  //
-                  // Water mesh
-                  // A flat plane extending to frustum depth that follows
-                  // viewer position horizontally.
-                  // Shader does environmental mapping to reflect skydome,
-                  // blend with water colour, and apply fog in distance.
-
-                  Object.defineProperty(exports, "__esModule", {value: true});
-                  // Uses water shaders (see: shader/water.*.glsl)
-                  // LICENSE: MIT
-                  // Copyright (c) 2016 by Mike Linkovich
-                  /// <reference path="types/three-global.d.ts" />
-                  var vec_1 = NTS_VEC;
-                  var _time = 0;
-                  /** Create Water Mesh */
-                  function createMesh(opts) {
-                      opts.envMap.wrapS = opts.envMap.wrapT = THREE.RepeatWrapping;
-                      opts.envMap.minFilter = opts.envMap.magFilter = THREE.LinearFilter;
-                      opts.envMap.generateMipmaps = false;
-                      var mat = new THREE.RawShaderMaterial({
-                          uniforms: {
-                              time: {type: '1f', value: 0.0},
-                              viewPos: {type: '3f', value: [0.0, 0.0, 10.0]},
-                              map: {type: 't', value: opts.envMap},
-                              waterLevel: {type: '1f', value: opts.waterLevel},
-                              waterColor: {type: '3f', value: vec_1.Color.toArray(opts.waterColor)},
-                              fogColor: {type: '3f', value: vec_1.Color.toArray(opts.fogColor)},
-                              fogNear: {type: 'f', value: 1.0},
-                              fogFar: {type: 'f', value: opts.fogFar * 1.5},
-                          },
-                          vertexShader: opts.vertScript,
-                          fragmentShader: opts.fragScript
-                      });
-                      var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2000.0, 2000.0), mat);
-                      mesh.frustumCulled = false;
-                      _time = Date.now();
-                      return mesh;
-                  }
-                  exports.createMesh = createMesh;
-                  function update(mesh, viewPos) {
-                      mesh.position.x = viewPos.x;
-                      mesh.position.y = viewPos.y;
-                      var mat = mesh.material;
-                      var vp = mat.uniforms['viewPos'].value;
-                      vp[0] = viewPos.x;
-                      vp[1] = viewPos.y;
-                      vp[2] = viewPos.z;
-                      mat.uniforms['time'].value = (Date.now() - _time) / 250.0;
-                  }
-                  exports.update = update;
-
-              }, {}],
+          21: [function (require, module, exports) {/*water.js*/}, {}],
 
           22: [function (require, module, exports) {
                   "use strict";
@@ -1308,10 +1211,10 @@
                   var heightfield_2 = NTS_HEIGHTFIELD;
                   var grass = __importStar(require("./grass"));
                   var terrain_1 = __importDefault(require("./terrain"));
-                  var terramap = __importStar(require("./terramap"));
-                  var water = __importStar(require("./water"));
+                  var terramap = NTS_TERRAMAP;//__importStar(require("./terramap"));
+                  var water = NTS_WATER;
                   var player_1 = __importDefault(require("./player"));
-                  var fps_1 = __importDefault(require("./fps"));
+                  var fps_1 = NTS_FPS;
                   var VIEW_DEPTH = 2000.0;
                   var MAX_TIMESTEP = 67; // max 67 ms/frame
                   var HEIGHTFIELD_SIZE = 3072.0;
@@ -1479,7 +1382,7 @@
                           var mat = meshes.grass.material;
                           mat.uniforms['windIntensity'].value = windIntensity;
                       });
-                      var fpsMon = fps_1.default();
+                      var fpsMon = fps_1.FPSMonitor();
                       ///////////////////////////////////////////////////////////////////
                       // Public World instance methods
                       /**
@@ -1605,4 +1508,4 @@
                   }
                   exports.default = World;
 
-              }, {"./fps": 4, "./grass": 7, "./player": 14, "./terrain": 17, "./terramap": 18, "./water": 21}]}, {}, [12]);
+              }, {"./grass": 7, "./player": 14, "./terrain": 17, "./terramap": 18}]}, {}, [12]);

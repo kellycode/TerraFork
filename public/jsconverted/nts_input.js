@@ -45,7 +45,7 @@ let NTS_INPUT = {
             this.keyStates[ev.keyCode] = true;
             var codeStr = ev.keyCode.toString();
             if (typeof this.keyPressListeners[codeStr] === 'function') {
-                console.log(codeStr);
+                //console.log(codeStr);
                 this.keyPressListeners[codeStr]();
             }
         }
