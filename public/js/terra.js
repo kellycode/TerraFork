@@ -55,7 +55,7 @@
                   var loader_1 = NTS_LOADER;
                   var input = NTS_INPUT;
                   var anim = NTS_ANIM;
-                  var fullscreen = __importStar(require("./fullscreen"));
+                  var fullscreen = NTS_FULLSCREEN;//__importStar(require("./fullscreen"));
                   var world_1 = __importDefault(require("./world"));
 // circa 2016
                   var CONFIGS = {
@@ -298,47 +298,9 @@
 
               }, {}],
 
-          5: [function (require, module, exports) {/*browser.js*/
-                  "use strict";
-                  // LICENSE: MIT
-                  // Copyright (c) 2016 by Mike Linkovich
-                  Object.defineProperty(exports, "__esModule", {value: true});
-                  function toggle(el) {
-                      if (!is()) {
-                          /*if (document.mozFullscreenEnabled === false) {
-                           console.warn("Fullscreen may not be available")
-                           }*/
-                          if (el.requestFullscreen) {
-                              el.requestFullscreen();
-                          } else if (el.msRequestFullscreen) {
-                              el.msRequestFullscreen();
-                          } else if (el.mozRequestFullScreen) {
-                              el.mozRequestFullScreen();
-                          } else if (el.webkitRequestFullscreen) {
-                              el.webkitRequestFullscreen();
-                          }
-                      } else {
-                          if (document.exitFullscreen) {
-                              document.exitFullscreen();
-                          } else if (document.msExitFullscreen) {
-                              document.msExitFullscreen();
-                          } else if (document.mozCancelFullScreen) {
-                              document.mozCancelFullScreen();
-                          } else if (document.webkitExitFullscreen) {
-                              document.webkitExitFullscreen();
-                          }
-                      }
-                  }
-                  exports.toggle = toggle;
-                  function is() {
-                      return !!document.fullscreenElement || !!document.mozFullScreenElement ||
-                            !!document.webkitFullscreenElement || !!document.msFullscreenElement;
-                  }
-                  exports.is = is;
+          5: [function (require, module, exports) {/*fullscreen.js*/}, {}],
 
-              }, {}],
-
-          6: [function (require, module, exports) {}, {}],
+          6: [function (require, module, exports) {/*gmath.js*/}, {}],
 
           7: [function (require, module, exports) {
                   "use strict";
