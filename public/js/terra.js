@@ -272,7 +272,8 @@
                   /// <reference path="types/three-global.d.ts" />
                   var gmath_1 = NTS_GMATH;
                   var vec_1 = NTS_VEC;
-                  var simplex_1 = __importDefault(require("./simplex"));
+                  var simplex_1 = NTS_SIMPLEX.seed(0);
+                  //var simplex_seed = simplex_t.seed(0);
                   var BLADE_SEGS = 4; // # of blade segments
                   var BLADE_VERTS = (BLADE_SEGS + 1) * 2; // # of vertices per blade (1 side)
                   var BLADE_INDICES = BLADE_SEGS * 12;
@@ -377,7 +378,7 @@
                   function initBladeShapeVerts(shape, numBlades, offset) {
                       var noise = 0;
                       for (var i = 0; i < numBlades; ++i) {
-                          noise = Math.abs(simplex_1.default(offset[i * 4 + 0] * 0.03, offset[i * 4 + 1] * 0.03));
+                          noise = Math.abs(simplex_1.simplex(offset[i * 4 + 0] * 0.03, offset[i * 4 + 1] * 0.03));
                           noise = noise * noise * noise;
                           noise *= 5.0;
                           shape[i * 4 + 0] = BLADE_WIDTH + Math.random() * BLADE_WIDTH * 0.5; // width
@@ -422,7 +423,7 @@
                   }
                   exports.update = update;
 
-              }, {"./simplex": 15}],
+              }, {}],
 
           8: [function (require, module, exports) {/*heightfield.js*/
               }, {}],
@@ -758,149 +759,7 @@
 
               }, {}],
 
-          15: [function (require, module, exports) {
-                  "use strict";
-                  /*
-                   * A speed-improved perlin and simplex noise algorithms for 2D.
-                   *
-                   * Based on example code by Stefan Gustavson (stegu@itn.liu.se).
-                   * Optimisations by Peter Eastman (peastman@drizzle.stanford.edu).
-                   * Better rank ordering method by Stefan Gustavson in 2012.
-                   * Converted to Javascript by Joseph Gentle.
-                   *
-                   * Version 2012-03-09
-                   *
-                   * This code was placed in the public domain by its original author,
-                   * Stefan Gustavson. You may use it as you see fit, but
-                   * attribution is appreciated.
-                   *
-                   * --------------------
-                   * TypeScriptified 2016
-                   */
-                  Object.defineProperty(exports, "__esModule", {value: true});
-                  var Grad = /** @class */ (function () {
-                      function Grad(x, y, z) {
-                          this.x = x;
-                          this.y = y;
-                          this.z = z;
-                      }
-                      Grad.prototype.dot2 = function (x, y) {
-                          return this.x * x + this.y * y;
-                      };
-                      Grad.prototype.dot3 = function (x, y, z) {
-                          return this.x * x + this.y * y + this.z * z;
-                      };
-                      return Grad;
-                  }());
-                  var F2 = 0.5 * (Math.sqrt(3) - 1);
-                  var G2 = (3 - Math.sqrt(3)) / 6;
-                  var perm = new Array(512);
-                  var gradP = new Array(512);
-                  var grad3 = [
-                      new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0),
-                      new Grad(1, 0, 1), new Grad(-1, 0, 1), new Grad(1, 0, -1), new Grad(-1, 0, -1),
-                      new Grad(0, 1, 1), new Grad(0, -1, 1), new Grad(0, 1, -1), new Grad(0, -1, -1)
-                  ];
-                  var p = [
-                      151, 160, 137, 91, 90, 15,
-                      131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
-                      190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
-                      88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166,
-                      77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244,
-                      102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196,
-                      135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123,
-                      5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42,
-                      223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9,
-                      129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228,
-                      251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107,
-                      49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254,
-                      138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180
-                  ];
-                  // This isn't a very good seeding function, but it works ok. It supports 2^16
-                  // different seed values. Write something better if you need more seeds.
-                  function seed(seed) {
-                      if (seed > 0 && seed < 1) {
-                          // Scale the seed out
-                          seed *= 65536;
-                      }
-                      seed = Math.floor(seed);
-                      if (seed < 256) {
-                          seed |= seed << 8;
-                      }
-                      for (var i = 0; i < 256; i++) {
-                          var v = void 0;
-                          if (i & 1) {
-                              v = p[i] ^ (seed & 255);
-                          } else {
-                              v = p[i] ^ ((seed >> 8) & 255);
-                          }
-                          perm[i] = perm[i + 256] = v;
-                          gradP[i] = gradP[i + 256] = grad3[v % 12];
-                      }
-                  }
-                  seed(0);
-                  // 2D simplex noise
-                  function simplex(xin, yin) {
-                      var n0, n1, n2; // Noise contributions from the three corners
-                      // Skew the input space to determine which simplex cell we're in
-                      var s = (xin + yin) * F2; // Hairy factor for 2D
-                      var i = Math.floor(xin + s);
-                      var j = Math.floor(yin + s);
-                      var t = (i + j) * G2;
-                      var x0 = xin - i + t; // The x,y distances from the cell origin, unskewed.
-                      var y0 = yin - j + t;
-                      // For the 2D case, the simplex shape is an equilateral triangle.
-                      // Determine which simplex we are in.
-                      var i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords
-                      if (x0 > y0) { // lower triangle, XY order: (0,0)->(1,0)->(1,1)
-                          i1 = 1;
-                          j1 = 0;
-                      } else { // upper triangle, YX order: (0,0)->(0,1)->(1,1)
-                          i1 = 0;
-                          j1 = 1;
-                      }
-                      // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
-                      // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
-                      // c = (3-sqrt(3))/6
-                      var x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords
-                      var y1 = y0 - j1 + G2;
-                      var x2 = x0 - 1 + 2 * G2; // Offsets for last corner in (x,y) unskewed coords
-                      var y2 = y0 - 1 + 2 * G2;
-                      // Work out the hashed gradient indices of the three simplex corners
-                      i &= 255;
-                      j &= 255;
-                      var gi0 = gradP[i + perm[j]];
-                      var gi1 = gradP[i + i1 + perm[j + j1]];
-                      var gi2 = gradP[i + 1 + perm[j + 1]];
-                      // Calculate the contribution from the three corners
-                      var t0 = 0.5 - x0 * x0 - y0 * y0;
-                      if (t0 < 0) {
-                          n0 = 0;
-                      } else {
-                          t0 *= t0;
-                          n0 = t0 * t0 * gi0.dot2(x0, y0); // (x,y) of grad3 used for 2D gradient
-                      }
-                      var t1 = 0.5 - x1 * x1 - y1 * y1;
-                      if (t1 < 0) {
-                          n1 = 0;
-                      } else {
-                          t1 *= t1;
-                          n1 = t1 * t1 * gi1.dot2(x1, y1);
-                      }
-                      var t2 = 0.5 - x2 * x2 - y2 * y2;
-                      if (t2 < 0) {
-                          n2 = 0;
-                      } else {
-                          t2 *= t2;
-                          n2 = t2 * t2 * gi2.dot2(x2, y2);
-                      }
-                      // Add contributions from each corner to get the final noise value.
-                      // The result is scaled to return values in the interval [-1,1].
-                      return 70 * (n0 + n1 + n2);
-                  }
-                  exports.default = simplex;
-
-              }, {}],
+          15: [function (require, module, exports) {/*simplex.js*/}, {}],
 
           16: [function (require, module, exports) {/*skydome.js*/}, {}],
 
@@ -1052,128 +911,7 @@
 
               }, {}],
 
-          18: [function (require, module, exports) {/*terramap.js*/
-                  "use strict";
-                  // LICENSE: MIT
-                  // Copyright (c) 2016 by Mike Linkovich
-                  Object.defineProperty(exports, "__esModule", {value: true});
-                  /// <reference path="types/three-global.d.ts" />
-                  var gmath_1 = NTS_GMATH;
-                  var vec_1 = NTS_VEC;
-                  /**
-                   * Create a texture containing height, lighting, etc. data
-                   * encoded into RGBA channels.
-                   */
-                  function createTexture(hf, lightDir, imgWind) {
-                      var canvas = document.createElement('canvas');
-                      var canvasWidth = hf.xCount + 1;
-                      var canvasHeight = hf.yCount + 1;
-                      canvas.width = canvasWidth;
-                      canvas.height = canvasHeight;
-                      var ctx = canvas.getContext('2d');
-                      var imgData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
-                      // Fill R (height) and G (light) values from heightfield data and computed light
-                      computeData(hf, lightDir, imgData.data);
-                      // Add wind intensity to B channel
-                      addWindData(imgWind, imgData.data);
-                      ctx.putImageData(imgData, 0, 0);
-                      var tex = new THREE.Texture(canvas);
-                      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-                      tex.needsUpdate = true;
-                      return tex;
-                  }
-                  exports.createTexture = createTexture;
-                  /**
-                   * Pack heights and lighting into RGBA data
-                   */
-                  function computeData(hf, lightDir, buf) {
-                      var vnorms = hf.vtxNormals;
-                      var w = hf.xCount + 1;
-                      var h = hf.yCount + 1;
-                      var n = vec_1.Vec3.create();
-                      var tStart = Date.now();
-                      for (var y = 0; y < h; ++y) {
-                          for (var x = 0; x < w; ++x) {
-                              var iSrc = y * w + x;
-                              var iDst = (h - y - 1) * w + x;
-                              // Get height, scale & store in R component
-                              buf[iDst * 4 + 0] = Math.round(hf.heights[iSrc] / hf.maxHeight * 255.0);
-                              // Get normal at this location to compute light
-                              var ni = iSrc * 3;
-                              n.x = vnorms[ni++];
-                              n.y = vnorms[ni++];
-                              n.z = vnorms[ni++];
-                              // Compute light & store in G component
-                              var light = Math.max(-vec_1.Vec3.dot(n, lightDir), 0.0);
-                              light *= computeShade(hf, lightDir, x, y);
-                              buf[iDst * 4 + 1] = Math.round(light * 255.0);
-                              //buf[iDst * 4 + 2] = ... // B channel for terrain type?
-                              buf[iDst * 4 + 3] = 255; // must set alpha to some value > 0
-                          }
-                      }
-                      var dt = Date.now() - tStart;
-                      console.log("computed terrain data texture (" + w + "x" + h + ") values in " + dt + "ms");
-                      return buf;
-                  }
-                  var _v = vec_1.Vec2.create();
-                  function computeShade(hf, lightDir, ix, iy) {
-                      // Make a normalized 2D direction vector we'll use to walk horizontally
-                      // toward the lightsource until z reaches max height
-                      var shadGradRange = 5.0;
-                      var hdir = _v;
-                      var w = hf.xCount + 1;
-                      var h = hf.yCount + 1;
-                      var i = iy * w + ix;
-                      var height = hf.heights[i]; // height at this point
-                      hdir.x = -lightDir.x;
-                      hdir.y = -lightDir.y;
-                      vec_1.Vec2.normalize(hdir, hdir);
-                      var zstep = (vec_1.Vec2.length(hdir) / vec_1.Vec2.length(lightDir)) * (-lightDir.z);
-                      var x = ix;
-                      var y = iy;
-                      // Walk along the direction until we discover this point
-                      // is in shade or the light vector is too high to be shaded
-                      while (height < hf.maxHeight) {
-                          x += hdir.x;
-                          y += hdir.y;
-                          height += zstep;
-                          var qx = gmath_1.pmod(Math.round(x), w);
-                          var qy = gmath_1.pmod(Math.round(y), h);
-                          var sampleHeight = hf.heights[qy * w + qx];
-                          if (sampleHeight > height) {
-                              if (sampleHeight - height > shadGradRange)
-                                  return 0.7; // this point is in shade
-                              else
-                                  return 0.7 + 0.3 * (shadGradRange - (sampleHeight - height)) / shadGradRange;
-                          }
-                      }
-                      return 1.0;
-                  }
-                  /**
-                   * Put wind data from the wind image to the b channel
-                   */
-                  function addWindData(imgWind, buf) {
-                      var canvas = document.createElement('canvas');
-                      var w = imgWind.naturalWidth;
-                      var h = imgWind.naturalHeight;
-                      canvas.width = w;
-                      canvas.height = h;
-                      var ctxSrc = canvas.getContext('2d');
-                      ctxSrc.drawImage(imgWind, 0, 0);
-                      var windData = ctxSrc.getImageData(0, 0, w, h).data;
-                      for (var y = 0; y < h; ++y) {
-                          for (var x = 0; x < w; ++x) {
-                              var i = (y * w + x) * 4;
-                              // Get R channel from src. We only use the single channel
-                              // because assume src img is grayscale.
-                              var p = windData[i];
-                              // Now set the B channel of the buffer we're writing to
-                              buf[i + 2] = p;
-                          }
-                      }
-                  }
-
-              }, {}],
+          18: [function (require, module, exports) {/*terramap.js*/}, {}],
 
           19: [function () {/*util.js*/
               }, {}],
@@ -1211,7 +949,7 @@
                   var heightfield_2 = NTS_HEIGHTFIELD;
                   var grass = __importStar(require("./grass"));
                   var terrain_1 = __importDefault(require("./terrain"));
-                  var terramap = NTS_TERRAMAP;//__importStar(require("./terramap"));
+                  var terramap = NTS_TERRAMAP;
                   var water = NTS_WATER;
                   var player_1 = __importDefault(require("./player"));
                   var fps_1 = NTS_FPS;
@@ -1508,4 +1246,4 @@
                   }
                   exports.default = World;
 
-              }, {"./grass": 7, "./player": 14, "./terrain": 17, "./terramap": 18}]}, {}, [12]);
+              }, {"./grass": 7, "./player": 14, "./terrain": 17}]}, {}, [12]);
