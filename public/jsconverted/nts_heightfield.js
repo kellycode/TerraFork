@@ -1,6 +1,6 @@
 "use strict";
 
-let NTS_HEIGHTFIELD_2 = {
+let NTS_HEIGHTFIELD = {
 
     Heightfield: function (info) {
         var hf = {
@@ -193,8 +193,8 @@ let NTS_HEIGHTFIELD_2 = {
                 return;
             }
             // wrap around
-            x = (0, gmath_1.pmod)(x - ox, hf.xSize) + ox;
-            y = (0, gmath_1.pmod)(y - oy, hf.ySize) + oy;
+            x = (0, NTS_GMATH.pmod)(x - ox, hf.xSize) + ox;
+            y = (0, NTS_GMATH.pmod)(y - oy, hf.ySize) + oy;
         }
         var csz = hf.cellSize, normals = hf.faceNormals, n = hi.n, ix = Math.floor((x - ox) / csz), iy = Math.floor((y - oy) / csz), ih = ix + iy * (hf.xCount + 1), // height index
         px = (x - ox) % csz, // relative x,y within this quad
@@ -223,8 +223,8 @@ let NTS_HEIGHTFIELD_2 = {
     heightAt: function(hf, x, y, wrap) {
         this._hi = this.HInfo();
         if (wrap === void 0) { wrap = false; }
-        infoAt(hf, x, y, wrap, _hi);
-        return _hi.z;
+        this.infoAt(hf, x, y, wrap, this._hi);
+        return this._hi.z;
     },
     
     getPlaneZ: function(n, z0, x, y) {
