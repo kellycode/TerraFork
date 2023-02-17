@@ -480,7 +480,7 @@
           11: [function (require, module, exports) {/*logger.js*/
               }, {}],
 
-          12: [function (require, module, exports) {
+          12: [function (require, module, exports) {/*main.js*/
                   "use strict";
                   var __importDefault = (this && this.__importDefault) || function (mod) {
                       return (mod && mod.__esModule) ? mod : {"default": mod};
@@ -946,25 +946,7 @@
 
               }, {}],
 
-          16: [function (require, module, exports) {
-                  "use strict";
-                  /// <reference path="types/three-global.d.ts" />
-                  Object.defineProperty(exports, "__esModule", {value: true});
-                  function createMesh(tex, radius, lats, lngs) {
-                      if (lats === void 0) {
-                          lats = 16;
-                      }
-                      if (lngs === void 0) {
-                          lngs = 32;
-                      }
-                      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-                      return new THREE.Mesh(new THREE.SphereGeometry(radius, lngs, lats, 0, Math.PI * 2.0, 0, Math.PI / 2.0).rotateX(Math.PI / 2.0).rotateZ(Math.PI), new THREE.MeshBasicMaterial({
-                          color: 0xFFFFFF, side: THREE.BackSide, map: tex, fog: false
-                      }));
-                  }
-                  exports.createMesh = createMesh;
-
-              }, {}],
+          16: [function (require, module, exports) {/*skydome.js*/}, {}],
 
           17: [function (require, module, exports) {
                   "use strict";
@@ -1322,7 +1304,7 @@
                   var vec_1 = NTS_VEC;
                   var logger = NTS_LOGGER;
                   var input = NTS_INPUT;
-                  var skydome = __importStar(require("./skydome"));
+                  var skydome = NTS_SKYDOME;
                   var heightfield_2 = NTS_HEIGHTFIELD;
                   var grass = __importStar(require("./grass"));
                   var terrain_1 = __importDefault(require("./terrain"));
@@ -1623,4 +1605,4 @@
                   }
                   exports.default = World;
 
-              }, {"./fps": 4, "./grass": 7, "./player": 14, "./skydome": 16, "./terrain": 17, "./terramap": 18, "./water": 21}]}, {}, [12]);
+              }, {"./fps": 4, "./grass": 7, "./player": 14, "./terrain": 17, "./terramap": 18, "./water": 21}]}, {}, [12]);

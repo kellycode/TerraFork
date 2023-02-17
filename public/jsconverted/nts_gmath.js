@@ -9,7 +9,7 @@ let NTS_GMATH = {
     },
 
     roundFrac: function (n, places) {
-        console.log(NTS_GMATH.PI2)
+        //console.log(NTS_GMATH.PI2);
         let d = Math.pow(10, places);
         return Math.round((n + 0.000000001) * d) / d;
     },
@@ -38,4 +38,4 @@ let NTS_GMATH = {
     dot: function (x0, y0, x1, y1) {
         return (x0 * x1 + y0 * y1);
     }
-}
+};
