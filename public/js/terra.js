@@ -160,6 +160,7 @@
                                   util_1.$e('btn_start').onclick = function () {
                                       anim.fadeOut(util_1.$e('loading_block'), 80, function () {
                                           util_1.$e('loading_block').style.display = 'none';
+                                          util_1.$e('app_ui_container').style.backgroundColor = 'transparent';
                                           if (!isFullscreen) {
                                               util_1.$e('title_bar').style.display = 'block';
                                           }
