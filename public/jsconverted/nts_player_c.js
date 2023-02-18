@@ -1,14 +1,9 @@
-/*player.js*/
 "use strict";
 // Copyright (c) 2016 by Mike Linkovich
 
-
-//Tools -> Options -> Editor -> Code Completion -> Auto popup documentation window
-
-
 // Creates a Player instance
 // (User first person camera)
-class Player {
+class NTS_PLAYER_C {
 
     constructor(heightField, waterHeight) {
 
@@ -45,7 +40,7 @@ class Player {
         this.NUM_MODES = 3;
 
         //let autoplay = true
-        this.mode = MODE_FLY;
+        this.mode = this.MODE_FLY;
         this.curT = 0;
         this.state = {
             pos: NTS_VEC.Vec3.create(0.0, 0.0, this.DEFAULT_HEIGHT),
@@ -61,7 +56,7 @@ class Player {
         };
 
         NTS_INPUT.setKeyPressListener(13, function () {
-            nextMode();
+            this.nextMode();
             if (this.mode === this.MODE_AUTO) {
                 NTS_LOGGER.hide();
                 NTS_NOTIFICATION.notify('Press ENTER to change camera');
@@ -71,7 +66,7 @@ class Player {
                 NTS_LOGGER.show();
                 NTS_NOTIFICATION.notify('ARROWS move, W/S move up/down, Q/A look up/down');
             }
-        });
+        }.bind(this));
 
         // scratchpad vectors
         this._a = NTS_VEC.Vec3.create();
@@ -86,7 +81,7 @@ class Player {
         this.curT += dt;
         // Update auto or manual
         if (this.mode === this.MODE_AUTO) {
-            this.updateAuto(curT / 1000.0, dt);
+            this.updateAuto(this.curT / 1000.0, dt);
         } else if (this.mode === this.MODE_FLY) {
             this.updateDrone(NTS_INPUT.state, dt);
         } else if (this.mode === this.MODE_MAN) {
@@ -242,81 +237,100 @@ class Player {
         // Calc pitch resist forces
         var pr = -this.state.pitch * this.PITCH_RESIST;
         var pf = -NTS_GMATH.sign(this.state.pitchVel) * this.PITCH_FRIC * Math.abs(this.state.pitchVel);
+        
         // total pitch accel
         pa = pa + pr + pf;
-        state.pitchVel += pa * ft;
-        state.pitch += state.pitchVel * ft;
+        this.state.pitchVel += pa * ft;
+        this.state.pitch += this.state.pitchVel * ft;
+        
         // Calc accel vector
-        NTS_VEC.Vec3.set(_a, 0, 0, 0);
-        _a.x = -state.pitch * ACCEL * Math.cos(state.yaw);
-        _a.y = -state.pitch * ACCEL * Math.sin(state.yaw);
+        NTS_VEC.Vec3.set(this._a, 0, 0, 0);
+        this._a.x = -this.state.pitch * this.ACCEL * Math.cos(this.state.yaw);
+        this._a.y = -this.state.pitch * this.ACCEL * Math.sin(this.state.yaw);
+        
         // Calc drag vector (horizontal)
-        var absVel = NTS_VEC.Vec2.length(state.vel); // state.vel.length()
-        _d.x = -state.vel.x;
-        _d.y = -state.vel.y;
-        NTS_VEC.Vec2.setLength(_d, absVel * DRAG, _d);
+        var absVel = NTS_VEC.Vec2.length(this.state.vel); // state.vel.length()
+        this._d.x = -this.state.vel.x;
+        this._d.y = -this.state.vel.y;
+        NTS_VEC.Vec2.setLength(this._d, absVel * this.DRAG, this._d);
+        
         // Calc vertical accel
-        if (i.up > 0 && state.pos.z < MAX_HEIGHT - 2.0) {
-            _a.z = VACCEL;
-        } else if (i.down > 0 && state.pos.z > MIN_HEIGHT) {
-            _a.z = -VACCEL;
+        if (i.up > 0 && this.state.pos.z < this.MAX_HEIGHT - 2.0) {
+            this._a.z = this.VACCEL;
+        } else if (i.down > 0 && this.state.pos.z > this.MIN_HEIGHT) {
+            this._a.z = -this.VACCEL;
         }
-        _d.z = -state.vel.z * VDRAG;
+        
+        this._d.z = -this.state.vel.z * this.VDRAG;
+        
         // update vel
-        state.vel.x += (_a.x + _d.x) * ft;
-        state.vel.y += (_a.y + _d.y) * ft;
-        state.vel.z += (_a.z + _d.z) * ft;
+        this.state.vel.x += (this._a.x + this._d.x) * ft;
+        this.state.vel.y += (this._a.y + this._d.y) * ft;
+        this.state.vel.z += (this._a.z + this._d.z) * ft;
+        
         // update pos
-        state.pos.x += state.vel.x * ft;
-        state.pos.y += state.vel.y * ft;
-        state.pos.z += state.vel.z * ft;
-        var groundHeight = Math.max(NTS_HEIGHTFIELD.heightAt(this.HEIGHTFIELD, state.pos.x, state.pos.y, true), this.WATERHEIGHT);
-        if (state.pos.z < groundHeight + MIN_HEIGHT) {
-            state.pos.z = groundHeight + MIN_HEIGHT;
-        } else if (state.pos.z > MAX_HEIGHT) {
-            state.pos.z = MAX_HEIGHT;
+        this.state.pos.x += this.state.vel.x * ft;
+        this.state.pos.y += this.state.vel.y * ft;
+        this.state.pos.z += this.state.vel.z * ft;
+        
+        var groundHeight = Math.max(NTS_HEIGHTFIELD.heightAt(this.HEIGHTFIELD, this.state.pos.x, this.state.pos.y, true), this.WATERHEIGHT);
+        
+        if (this.state.pos.z < groundHeight + this.MIN_HEIGHT) {
+            this.state.pos.z = groundHeight + this.MIN_HEIGHT;
+        } else if (this.state.pos.z > this.MAX_HEIGHT) {
+            this.state.pos.z = this.MAX_HEIGHT;
         }
     }
 
     // Manual movement
     updateManual(i, dt) {
         var ft = dt / 1000.0;
-        state.yawVel = 0;
+        this.state.yawVel = 0;
+        
         if (i.left) {
-            state.yawVel = MAN_YAWVEL;
+            this.state.yawVel = this.MAN_YAWVEL;
         } else if (i.right) {
-            state.yawVel = -MAN_YAWVEL;
+            this.state.yawVel = -this.MAN_YAWVEL;
         }
-        state.yaw += state.yawVel * ft;
-        state.pitchVel = 0;
+        
+        this.state.yaw += this.state.yawVel * ft;
+        this.state.pitchVel = 0;
+        
         if (i.pitchup) {
-            state.pitchVel = MAN_PITCHVEL;
+            this.state.pitchVel = this.MAN_PITCHVEL;
         } else if (i.pitchdown) {
-            state.pitchVel = -MAN_PITCHVEL;
+            this.state.pitchVel = -this.MAN_PITCHVEL;
         }
-        state.pitch += state.pitchVel * ft;
-        state.pitch = NTS_GMATH.clamp(state.pitch, -MAN_MAXPITCH, MAN_MAXPITCH);
-        NTS_VEC.Vec3.set(state.vel, 0, 0, 0);
+        
+        this.state.pitch += this.state.pitchVel * ft;
+        this.state.pitch = NTS_GMATH.clamp(this.state.pitch, -this.MAN_MAXPITCH, this.MAN_MAXPITCH);
+        NTS_VEC.Vec3.set(this.state.vel, 0, 0, 0);
+        
         if (i.forward) {
-            state.vel.x = MAN_VEL * Math.cos(state.yaw);
-            state.vel.y = MAN_VEL * Math.sin(state.yaw);
+            this.state.vel.x = this.MAN_VEL * Math.cos(this.state.yaw);
+            this.state.vel.y = this.MAN_VEL * Math.sin(this.state.yaw);
         } else if (i.back) {
-            state.vel.x = -MAN_VEL * Math.cos(state.yaw);
-            state.vel.y = -MAN_VEL * Math.sin(state.yaw);
+            this.state.vel.x = -this.MAN_VEL * Math.cos(this.state.yaw);
+            this.state.vel.y = -this.MAN_VEL * Math.sin(this.state.yaw);
         }
-        state.pos.x += state.vel.x * ft;
-        state.pos.y += state.vel.y * ft;
+        
+        this.state.pos.x += this.state.vel.x * ft;
+        this.state.pos.y += this.state.vel.y * ft;
+        
         if (i.up) {
-            state.vel.z = MAN_ZVEL;
+            this.state.vel.z = this.MAN_ZVEL;
         } else if (i.down) {
-            state.vel.z = -MAN_ZVEL;
+            this.state.vel.z = -this.MAN_ZVEL;
         }
-        state.pos.z += state.vel.z * ft;
-        var groundHeight = Math.max(NTS_HEIGHTFIELD.heightAt(this.HEIGHTFIELD, state.pos.x, state.pos.y, true), this.WATERHEIGHT);
-        if (state.pos.z < groundHeight + MIN_HEIGHT) {
-            state.pos.z = groundHeight + MIN_HEIGHT;
-        } else if (state.pos.z > MAX_HEIGHT) {
-            state.pos.z = MAX_HEIGHT;
+        
+        this.state.pos.z += this.state.vel.z * ft;
+        
+        var groundHeight = Math.max(NTS_HEIGHTFIELD.heightAt(this.HEIGHTFIELD, this.state.pos.x, this.state.pos.y, true), this.WATERHEIGHT);
+        
+        if (this.state.pos.z < groundHeight + this.MIN_HEIGHT) {
+            this.state.pos.z = groundHeight + this.MIN_HEIGHT;
+        } else if (this.state.pos.z > this.MAX_HEIGHT) {
+            this.state.pos.z = this.MAX_HEIGHT;
         }
     }
 
