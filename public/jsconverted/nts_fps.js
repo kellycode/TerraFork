@@ -1,3 +1,7 @@
+// LICENSE: MIT
+// Copyright (c) 2016 by Mike Linkovich
+// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+
 "use strict";
 
 let NTS_FPS = {
@@ -15,9 +19,13 @@ let NTS_FPS = {
             ticks[i] = 16.66666667;
             sum += 16.66666667;
         }
-        /**
-         *  Update with new sample
-         *  @return New average frames/second
+        
+        /*
+         * Update with new sample
+         * @return New average frames/second
+         * 
+         * @param {type} dt
+         * @returns {Number|NTS_FPS.FPSMonitor.f}
          */
         function update(dt) {
             sum -= ticks[index];

@@ -1,3 +1,9 @@
+/*global THREE*/
+
+// LICENSE: MIT
+// Copyright (c) 2016 by Mike Linkovich
+// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+
 "use strict";
 
 // Water mesh
@@ -26,7 +32,7 @@ let NTS_WATER = {
                 waterColor: {type: '3f', value: NTS_VEC.Color.toArray(opts.waterColor)},
                 fogColor: {type: '3f', value: NTS_VEC.Color.toArray(opts.fogColor)},
                 fogNear: {type: 'f', value: 1.0},
-                fogFar: {type: 'f', value: opts.fogFar * 1.5},
+                fogFar: {type: 'f', value: opts.fogFar * 1.5}
             },
             vertexShader: opts.vertScript,
             fragmentShader: opts.fragScript

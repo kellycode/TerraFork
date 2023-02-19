@@ -284,8 +284,8 @@
                       return (mod && mod.__esModule) ? mod : {"default": mod};
                   };
                   Object.defineProperty(exports, "__esModule", {value: true});
-                  var app_1 = __importDefault(require("./app"));
-                  app_1.default().run();
+                  var app_1 = new NTS_APP_C();//__importDefault(require("./app"));
+                  app_1.run();
 
               }, {"./app": 2}],
 

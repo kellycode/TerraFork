@@ -1,4 +1,9 @@
 /*global THREE*/
+
+// LICENSE: MIT
+// Copyright (c) 2016 by Mike Linkovich
+// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+
 "use strict";
 
 // Creates & animates a large patch of grass to fill the foreground.
@@ -151,14 +156,12 @@ let NTS_GRASS = {
         }
     },
 
-    /**
-     * Call each frame to animate grass blades.
-     * @param mesh The patch of grass mesh returned from createMesh
-     * @param time Time in seconds
-     * @param x X coordinate of centre position to draw at
-     * @param y Y coord
-     */
 
+     // Call each frame to animate grass blades.
+     // @param mesh The patch of grass mesh returned from createMesh
+     // @param time Time in seconds
+     // @param x X coordinate of centre position to draw at
+     // @param y Y coord
     update: function (mesh, time, camPos, camDir, drawPos) {
         let mat = mesh.material;
         mat.uniforms['time'].value = time;

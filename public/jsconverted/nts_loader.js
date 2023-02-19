@@ -1,4 +1,9 @@
 /*global THREE*/
+
+// LICENSE: MIT
+// Copyright (c) 2016 by Mike Linkovich
+// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+
 "use strict";
 
 let NTS_LOADER = {
@@ -13,10 +18,8 @@ let NTS_LOADER = {
     done_cb: null,
     
     assets: {images: {}, text: {}, textures: {}},
-    /**
-     * Start loading a list of assets
-     */
-    //onAssetsLoaded, onAssetsProgress, onAssetsError
+    
+    // Start loading a list of assets
     load: function (assetList, onAssetsLoaded, onAssetsProgress, onAssetsError, onAssetsDone) {
         this.success_callback = onAssetsLoaded;
         this.progress_callback = onAssetsProgress;

@@ -1,6 +1,10 @@
-/*global THREE*/
-"use strict";
+/*global*/
+
+// LICENSE: MIT
 // Copyright (c) 2016 by Mike Linkovich
+// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+
+"use strict";
 
 class NTS_APP_C {
 
@@ -56,11 +60,11 @@ class NTS_APP_C {
     // Configuration UI input handlers
     configUI() {
         // Select a config roughly based on device type
-        let cfgId = NTS_BROWSER.isMobile.any ? 'mobile' : 'desktop';
-        let cfg = this.CONFIGS[cfgId];
+        let cfgDevice = NTS_BROWSER.isMobile.any ? 'mobile' : 'desktop';
+        let cfg = this.CONFIGS[cfgDevice];
 
         let sel = this.util_1.$i('sel_devicepower');
-        sel.value = this.cfgId;
+        sel.value = cfgDevice;
 
         let inp_blades = this.util_1.$i('inp_blades');
         inp_blades.value = cfg.blades.toString();
@@ -75,7 +79,7 @@ class NTS_APP_C {
             this.fullscreen.toggle(this.util_1.$e('app_container'));
         };
 
-        sel.onchange = function (e) {
+        sel.onchange = (e) => {
             let cfg = this.CONFIGS[sel.value];
             let b = cfg.blades.toString();
             let d = cfg.depth.toString();
@@ -109,12 +113,12 @@ class NTS_APP_C {
             //console.log('onAssetsProgress');
             let pct = Math.floor(p * 90);
             this.util_1.$e('loading_bar').style.width = pct + '%';
-        };
+        }.bind(this);
 
         let onAssetsError = function (e) {
             console.error('onAssetsError');
             this.util_1.$e('loading_text').textContent = e;
-        };
+        }.bind(this);
 
         let onAssetsLoaded = function (a) {
             //console.log('onAssetsLoaded');
@@ -122,13 +126,13 @@ class NTS_APP_C {
             this.util_1.$e('loading_bar').style.width = '100%';
             this.util_1.$e('loading_text').innerHTML = "&nbsp;";
 
-            setTimeout(function () {
-
+            setTimeout(() => {
+                
                 this.util_1.$e('loading_bar_outer').style.visibility = 'hidden';
                 this.util_1.$e('config_block').style.visibility = 'visible';
 
-                this.util_1.$e('btn_start').onclick = function () {
-                    this.anim.fadeOut(util_1.$e('loading_block'), 80, function () {
+                this.util_1.$e('btn_start').onclick = () => {
+                    this.anim.fadeOut(this.util_1.$e('loading_block'), 80, () => {
 
                         this.util_1.$e('loading_block').style.display = 'none';
                         this.util_1.$e('app_ui_container').style.backgroundColor = 'transparent';
@@ -137,11 +141,11 @@ class NTS_APP_C {
                             this.util_1.$e('title_bar').style.display = 'block';
                         }
 
-                        this.util_1.$e('btn_fullscreen').onclick = function () {
+                        this.util_1.$e('btn_fullscreen').onclick = () => {
                             this.fullscreen.toggle(util_1.$e('app_container'));
                         };
 
-                        this.util_1.$e('btn_restart').onclick = function () {
+                        this.util_1.$e('btn_restart').onclick = () => {
                             document.location.reload();
                         };
 
@@ -149,7 +153,7 @@ class NTS_APP_C {
                     });
                 };
             }, 10);
-        };
+        }.bind(this);
 
         this.loader_1.load({
             text: [
@@ -193,7 +197,7 @@ class NTS_APP_C {
         let antialias = !!(this.util_1.$i('chk_antialias').checked);
         
         // Create an instance of the world
-        this.world = new WORLD(this.assets, numGrassBlades, grassPatchRadius, this.displayWidth, this.displayHeight, antialias);
+        this.world = new this.WORLD(this.assets, numGrassBlades, grassPatchRadius, this.displayWidth, this.displayHeight, antialias);
         
         // Start our animation loop
         this.doFrame();
@@ -203,7 +207,7 @@ class NTS_APP_C {
     doFrame() {
         // keep animation loop running
         this.world.doFrame();
-        requestAnimationFrame(this.doFrame);
+        requestAnimationFrame(this.doFrame.bind(this));
     }
     
     

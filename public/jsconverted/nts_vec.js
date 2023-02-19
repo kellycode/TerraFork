@@ -1,8 +1,13 @@
+// LICENSE: MIT
+// Copyright (c) 2016 by Mike Linkovich
+// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+
 "use strict";
+
 // Vector Math with library-agnostic interface types.
 // i.e. Any object with matching property names will work,
 
-// 3D Vector functions
+// 3D VECTOR FUNCTIONS
 
 let NTS_VEC = {};
 
@@ -57,27 +62,28 @@ NTS_VEC.Vec2.normalize = function (v, out) {
 
 NTS_VEC.Vec2.dot = function (v0, v1) {
     return (v0.x * v1.x + v0.y * v1.y);
-}
+};
 
 NTS_VEC.Vec2.det = function (v0, v1) {
     return (v0.x * v1.y - v0.y * v1.x);
 };
 
-/** Rotate v by r radians, result in out. (v and out can reference the same Vec2 object) */
+// Rotate v by r radians, result in out.
+// (v and out can reference the same Vec2 object)
 NTS_VEC.Vec2.rotate = function (v, r, out) {
     var c = Math.cos(r), s = Math.sin(r), x = v.x, y = v.y;
     out.x = x * c - y * s;
     out.y = x * s + y * c;
 };
 
-/** Uses pre-computed cos & sin values of rotation angle */
+// Uses pre-computed cos & sin values of rotation angle
 NTS_VEC.Vec2.rotateCS = function (v, c, s, out) {
     var x = v.x, y = v.y;
     out.x = x * c - y * s;
     out.y = x * s + y * c;
 };
 
-/** nx,ny should be normalized; vx,vy length will be preserved */
+// nx,ny should be normalized; vx,vy length will be preserved
 NTS_VEC.Vec2.reflect = function (v, n, out) {
     var d = NTS_VEC.Vec2.dot(n, v);
     out.x = v.x - 2.0 * d * n.x;
@@ -88,9 +94,8 @@ NTS_VEC.Vec2.toArray = function (v) {
     return [v.x, v.y];
 };
 
-/**
- * 3D Vector functions
- */
+// 3D VECTOR FUNCTIONS
+
 NTS_VEC.Vec3 = {};
 
 NTS_VEC.Vec3.create = function (x, y, z) {
@@ -161,9 +166,9 @@ NTS_VEC.Vec3.toArray = function (v) {
     return [v.x, v.y, v.z];
 };
 
-/**
- * RGB Color functions
- */
+
+// RGB COLOR FUNCTIONS
+
 
 NTS_VEC.Color = {};
 

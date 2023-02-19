@@ -1,3 +1,7 @@
+// LICENSE: MIT
+// Copyright (c) 2016 by Mike Linkovich
+// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+
 "use strict";
 
 let NTS_HEIGHTFIELD = {
@@ -34,7 +38,7 @@ let NTS_HEIGHTFIELD = {
     HInfo: function () {
         return {
             i: 0, t: 0, z: 0.0, n: NTS_VEC.Vec3.create()
-        }
+        };
     },
 
     genFromImg: function (image, hf) {
@@ -231,4 +235,4 @@ let NTS_HEIGHTFIELD = {
         return z0 - (n.x * x + n.y * y) / n.z;
     }
 
-}
+};

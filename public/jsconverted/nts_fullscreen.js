@@ -1,3 +1,7 @@
+// LICENSE: MIT
+// Copyright (c) 2016 by Mike Linkovich
+// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+
 "use strict";
 
 let NTS_FULLSCREEN = {
@@ -33,4 +37,4 @@ let NTS_FULLSCREEN = {
         return !!document.fullscreenElement || !!document.mozFullScreenElement ||
               !!document.webkitFullscreenElement || !!document.msFullscreenElement;
     }
-}
+};
