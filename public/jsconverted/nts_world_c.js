@@ -1,8 +1,27 @@
 /*global THREE*/
 
+// USES:
+// THREE
+// NTS_UTIL
+// NTS_GMATH
+// NTS_VEC
+// NTS_LOGGER
+// NTS_INPUT
+// NTS_SKYDOME
+// NTS_HEIGHTFIELD
+// NTS_GRASS
+// NTS_TERRAIN
+// NTS_TERRAMAP
+// NTS_WATER
+// NTS_FPS
+// NTS_PLAYER_C
+
+// USED IN:
+// NTS_APP_C
+
 // LICENSE: MIT
 // Copyright (c) 2016 by Mike Linkovich
-// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+// Untypescript 2023 by Kearnan Kelly
 
 "use strict";
 

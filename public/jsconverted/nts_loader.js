@@ -1,8 +1,14 @@
 /*global THREE*/
 
+// USES:
+// THREE
+
+// USED IN:
+// NTS_APP_C
+
 // LICENSE: MIT
 // Copyright (c) 2016 by Mike Linkovich
-// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+// Untypescript 2023 by Kearnan Kelly
 
 "use strict";
 
@@ -53,22 +59,16 @@ let NTS_LOADER = {
     },
 
     loadText: function (ad) {
-        let self = this;
-        
-        // maintaining a 'pointer' to 'this'
-        function doProgressCallback() {
-            self.doProgress(self);
-        };
         
         let req = new XMLHttpRequest();
         req.overrideMimeType('*/*');
-        req.onreadystatechange = function () {
+        req.onreadystatechange = () => {
             if (req.readyState === 4) {
                 if (req.status === 200) {
-                    self.assets.text[ad.name] = req.responseText;
-                    doProgressCallback();
+                    this.assets.text[ad.name] = req.responseText;
+                    this.doProgress();
                 } else {
-                    self.doError("Error " + req.status + " loading " + ad.url);
+                    this.doError("Error " + req.status + " loading " + ad.url);
                 }
             }
         };
@@ -92,10 +92,10 @@ let NTS_LOADER = {
         this.assets.textures[ad.name] = new THREE.TextureLoader().load(ad.url, doProgressCallback);
     },
 
-    doProgress: function (self) {
-        self.numLoaded += 1;
-        self.progress_callback && self.progress_callback(self.numLoaded / self.totalToLoad);
-        self.tryDone();
+    doProgress: function () {
+        this.numLoaded += 1;
+        this.progress_callback && this.progress_callback(this.numLoaded / this.totalToLoad);
+        this.tryDone();
     },
 
     doError: function (e) {

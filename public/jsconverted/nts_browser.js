@@ -1,13 +1,20 @@
+
+// USES:
+// -
+
+// USED IN:
+// NTS_APP_C
+
 // LICENSE: MIT
 // Copyright (c) 2016 by Mike Linkovich
-// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+// Untypescript 2023 by Kearnan Kelly
 
 "use strict";
 
 let NTS_BROWSER = {
 
     // Try to determine if was launched from homescreen/desktop app launcher
-    // isStandalone not used anywhere but was a self-invoker
+    // isStandalone is not used anywhere but was a self-invoker
     isStandalone: function () {
         // iOS
         if (navigator.standalone !== undefined)
@@ -19,6 +26,7 @@ let NTS_BROWSER = {
         return window.matchMedia('(display-mode: standalone)').matches;
     },
 
+    // circa 2016
     isMobile: function () {
         var a = !!navigator.userAgent.match(/Android/i);
         var bb = !!navigator.userAgent.match(/BlackBerry/i);

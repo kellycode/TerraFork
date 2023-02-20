@@ -1,8 +1,19 @@
-/*global*/
+
+// USES:
+// NTS_UTIL
+// NTS_LOADER
+// NTS_INPUT
+// NTS_ANIM
+// NTS_FULLSCREEN
+// NTS_WORLD_C
+// NTS_BROWSER
+
+// USED IN:
+// -
 
 // LICENSE: MIT
 // Copyright (c) 2016 by Mike Linkovich
-// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+// Untypescript 2023 by Kearnan Kelly
 
 "use strict";
 

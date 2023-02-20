@@ -1,6 +1,20 @@
+
+// USES:
+// -
+
+// USED IN:
+// NTS_GRASS
+// NTS_HEIGHTFIELD
+// NTS_PLAYER_C
+// NTS_TERRAIN
+// NTS_TERRAMAP
+// NTS_VEC
+// NTS_WATER
+// NTS_WORLD_C
+
 // LICENSE: MIT
 // Copyright (c) 2016 by Mike Linkovich
-// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+// Untypescript 2023 by Kearnan Kelly
 
 "use strict";
 

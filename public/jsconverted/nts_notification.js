@@ -1,6 +1,14 @@
+
+// USES:
+// NTS_ANIM
+// NTS_UTIL
+
+// USED IN:
+// NTS_PLAYER_C
+
 // LICENSE: MIT
 // Copyright (c) 2016 by Mike Linkovich
-// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+// Untypescript 2023 by Kearnan Kelly
 
 "use strict";
 

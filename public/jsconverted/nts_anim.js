@@ -1,11 +1,16 @@
-/*global*/
+
+// USES:
+// NTS_GMATH
+
+// USED IN:
+// NTS_APP_C
+// NTS_NOTIFICATION
 
 // LICENSE: MIT
 // Copyright (c) 2016 by Mike Linkovich
-// Untypescript 2023 by Kearnan Kelly "https://github.com/kellycode"
+// Untypescript 2023 by Kearnan Kelly
 
 "use strict";
-
 
 let NTS_ANIM = {
 
