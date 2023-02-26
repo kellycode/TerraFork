@@ -1,8 +1,8 @@
 # TerraFork
 
-Fork of https://github.com/spacejack/terra
+Vanilla JS Fork of https://github.com/spacejack/terra
 
-Typescript dependency/dependencies removed.  
+Typescript removed. 
 Organized a bit.
 
 TODOs:  
