@@ -13,4 +13,6 @@ Organized a bit.
 
 TODOs:  
 Add a gulp builder for minification  
+Extract the grass/wind bits for easy use  
+
 
