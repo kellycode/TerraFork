@@ -1,5 +1,7 @@
 # TerraFork
 
+![a 3d terrain](https://kellycode.github.io/TerraFork/preview.jpg)
+
 Vanilla JS Fork of https://github.com/spacejack/terra
 
 Updated to THREE r147
